@@ -1,0 +1,33 @@
+{
+    "name": "javascript-parser",
+    "version": "1.0.0",
+    "description": "Javascript code, or numbers encoder",
+    "keywords": [
+        "code-golf",
+        "encoder",
+        "js1k",
+        "jscrush"
+    ],
+    "main": "dist/javascript-parser.esm.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "rollup -c"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/rucin93/javascript-parser.git"
+    },
+    "author": "Piotr Ruciński",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/rucin93/javascript-parser/issues"
+    },
+    "homepage": "https://github.com/rucin93/javascript-parser#readme",
+    "devDependencies": {
+        "@rollup/plugin-typescript": "^5.0.2",
+        "rollup": "^2.26.10",
+        "rollup-plugin-terser": "^7.0.2",
+        "tslib": "^2.0.1",
+        "typescript": "^4.0.2"
+    }
+}

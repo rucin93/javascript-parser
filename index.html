@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Text / numbers decoder</title>
+</head>
+<body>
+<div>
+    <style>
+        .active {
+            color: blue;
+        }
+    </style>
+    <button class="active">Text</button>
+    <button>Numbers</button>
+</div>
+<div>
+    <textarea id="input" cols="100" rows="20" style="margin-bottom: 50px" placeholder="Input"></textarea>
+</div>
+<div>
+    <textarea id="output" cols="100" rows="20" placeholder="Output"></textarea>
+</div>
+
+<script src="dist/javascript-parser.min.js" type="text/javascript"></script>
+
+<script>
+    const input = document.querySelector('#input');
+    const output = document.querySelector('#output');
+    const buttons = document.querySelectorAll('button');
+
+    let type = 'Text';
+
+    buttons.forEach(button => {
+        button.addEventListener('click', ()=> {
+            buttons.forEach(el=>el.classList.remove('active'))
+            button.classList.add('active')
+            type = button.innerText
+            input.value = ''
+            output.value = ''
+        })
+    })
+
+    input.addEventListener('change', () => {
+        if(input.value === '') {
+            output.value = '';
+        } else {
+            output.value = jsParser(input.value, type)
+        }
+    })
+</script>
+</body>
+</html>
