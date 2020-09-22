@@ -21,9 +21,11 @@
     <p>Beware Numbers option - it adds some zeros to the end, and sometimes not work</p>
 </div>
 <div>
+    <div class="counter">0</div>
     <textarea id="input" cols="100" rows="20" style="margin-bottom: 50px" placeholder="Input"></textarea>
 </div>
 <div>
+    <div class="counter">0</div>
     <textarea id="output" cols="100" rows="20" placeholder="Output"></textarea>
 </div>
 
@@ -31,7 +33,10 @@
 
 <script>
     const input = document.querySelector('#input');
+    const inputCounter = input.parentNode.querySelector('.counter');
     const output = document.querySelector('#output');
+    const outputCounter = output.parentNode.querySelector('.counter');
+
     const buttons = document.querySelectorAll('button');
 
     let type = 'Text';
@@ -47,11 +52,15 @@
     })
 
     input.addEventListener('input', () => {
-        if(input.value === '') {
+        if (input.value === '') {
             output.value = '';
         } else {
             output.value = jsParser(input.value, type)
         }
+
+        inputCounter.innerHTML = input.value.length;
+        outputCounter.innerHTML = output.value.length;
+
     })
 </script>
 </body>
