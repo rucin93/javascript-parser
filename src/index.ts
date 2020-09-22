@@ -1,9 +1,9 @@
 import { createCharDec } from './utils'
 
 function textParser(code: string): string {
-    let _ = ';' + code;
+    let _ = ';' + code.replace(/(\r\n|\n|\r)/gm, '\\n');
     const length = _.length
-    length % 3 !== 0 ? _ += ' '.repeat(length % 3) : '';
+    length % 3 !== 0 ? _ += ' '.repeat(3 - length % 3) : '';
 
     const test = _.match(/.../g).map(chars => {
         let result = 0
