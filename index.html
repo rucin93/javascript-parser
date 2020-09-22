@@ -58,8 +58,8 @@
             output.value = jsParser(input.value, type)
         }
 
-        inputCounter.innerHTML = input.value.length;
-        outputCounter.innerHTML = output.value.length;
+        inputCounter.innerHTML = [...input.value].length;
+        outputCounter.innerHTML = [...output.value].length;
 
     })
 </script>

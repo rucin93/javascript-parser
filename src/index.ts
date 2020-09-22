@@ -21,7 +21,7 @@ function numbersParser(code: string): string {
     let _ = code;
     const length = _.length
     const rest = length % spreadSize;
-    rest !== 0 ? _ += '0'.repeat(rest) : '';
+    rest !== 0 ? _ += '0'.repeat(spreadSize - rest) : '';
 
     const test = _.match(new RegExp(`.{${spreadSize}}`,'g')).map(num => createCharDec(num)).join(``)
 
