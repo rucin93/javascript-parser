@@ -24,8 +24,8 @@ function numbersParser(code: string): string {
     rest !== 0 ? _ += '0'.repeat(spreadSize - rest) : '';
 
     const test = _.match(new RegExp(`.{${spreadSize}}`,'g')).map(num => createCharDec(num)).join(``)
-
-    return `m='';for(x of\`${test}\`)m+=\`\${x.codePointAt()}\`.padStart(${spreadSize},0)`
+    let result = `m='';for(x of\`${test}\`)m+=\`\${x.codePointAt()}\`.padStart(${spreadSize},0)`
+    return rest !== 0 ? result += `;m=m.slice(0,-${spreadSize - rest})` : result
 }
 
 export default function parseCode(code: string, type: string): string {
