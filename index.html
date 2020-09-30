@@ -76,6 +76,7 @@
     <button id="packAction">Pack</button>
     <button id="testAllCases">testAllCases</button>
     <button id="replaceNums">replace 2**29</button>
+    <button id="replaceEval">replace eval</button>
     <button id="bitCrusher">bitCrusher</button>
     <br>
     <br>
@@ -250,6 +251,7 @@
     const buttonEl = document.querySelector('#packAction')
     const triggerTest = document.querySelector('#testAllCases')
     const replaceNums = document.querySelector('#replaceNums')
+    const replaceEval = document.querySelector('#replaceEval')
     const bitCrusherBtn = document.querySelector('#bitCrusher')
 
     const delay = () => new Promise(resolve => setTimeout(resolve, DELAY))
@@ -325,6 +327,12 @@
     bitCrusherBtn.addEventListener('click', ()=> {
         outputEl.value = bitCrusher(input.value)
     })
+
+    replaceEval.addEventListener('click', ()=> {
+        outputEl.value = outputEl.value.replace(/;eval/, ';print')
+    })
+
+
 
 </script>
 
