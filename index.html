@@ -285,7 +285,6 @@
             window.progress = true
 
             main().then(solutions => {
-                solutions.sort((a, b) => a.strLength - b.strLength)
                 console.log(solutions)
                 window.progress = false
             })
