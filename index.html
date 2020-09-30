@@ -29,26 +29,75 @@
         opacity: 1;
         visibility: visible;
     }
+
+    section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
 </style>
-<div>
+<nav>
     <button class="active">Two-One</button>
     <button>Three-One</button>
     <button>Four-One</button>
     <button>Numbers</button>
+</nav>
+<section>
+
+<div id="main">
+    <div>
+        <p>Beware Numbers option - it adds some zeros to the end, and sometimes not work</p>
+        <p>Four-One - problem with \n</p>
+    </div>
+
+    <div>
+        <div class="counter">0</div>
+        <textarea id="input" cols="70" rows="20" style="margin-bottom: 50px" placeholder="Input"></textarea>
+    </div>
+    <div>
+        <div class="counter">0</div>
+        <textarea id="output" cols="70" rows="20" placeholder="Output" readonly></textarea>
+    </div>
 </div>
-<div>
-    <p>Beware Numbers option - it adds some zeros to the end, and sometimes not work</p>
-    <p>Four-One - problem with \n</p>
-</div>
-<div>
-    <div class="counter">0</div>
-    <textarea id="input" cols="100" rows="20" style="margin-bottom: 50px" placeholder="Input"></textarea>
-</div>
-<div>
-    <div class="counter">0</div>
-    <textarea id="output" cols="100" rows="20" placeholder="Output" readonly></textarea>
+<div id="regPack">
+    <h2>RegPack</h2>
+    <br>
+    Score = <input type="text" size=6 value=1 id="paramFGain"/>
+    *gain + <input type="text" size=6 value=0 id="paramFLength"/>
+    *length + <input type="text" size=6 value=0 id="paramFCopies"/>
+    *copies
+    &nbsp;&nbsp;&nbsp;
+
+    Tiebreaker = <select id="paramFTiebreaker">
+    <option value=1 selected>longest string first (Js Crush)</option>
+    <option value=-1>most copies first (First Crush)</option>
+</select>
+    <br>
+    <br>
+    <button id="packAction">Pack</button>
+    <button id="testAllCases">testAllCases</button>
+    <button id="replaceNums">replace 2**29</button>
+    <br>
+    <br>
+
+    <div id="regPackOutput">
+        <div id="preprocessed" style="display: none">
+            <b id="stage0Title">Preprocessed : </b><b id="stage0Message"></b>
+            <br>
+            <div id="stage0Output" class="textBox"></div>
+            <textarea cols="70" rows="20" id="stage0Details"></textarea><br>
+        </div>
+        <div id="crushed">
+            <b id="stage1Title">Crushed : </b><b id="stage1Message"></b><input type="checkbox" id="stage1Base64"/>base64
+            <br><textarea cols="70" rows="20" id="stage1Output"></textarea><br>
+        </div>
+        <div id="packed" style="display: none">
+            <b id="stage2Title">RegPack'ed: </b><b id="stage2Message"></b><input type="checkbox" id="stage2Base64"/>base64
+            <br><textarea cols="70" rows="20" id="stage2Output"></textarea><br>
+        </div>
+    </div>
 </div>
 
+</section>
 <script src="dist/javascript-parser.min.js" type="text/javascript"></script>
 <div class="info">Copied!</div>
 <script>
@@ -57,25 +106,13 @@
     const output = document.querySelector('#output');
     const outputCounter = output.parentNode.querySelector('.counter');
 
-    const buttons = document.querySelectorAll('button');
+    const buttons = document.querySelectorAll('nav button');
     const info = document.querySelector('.info');
 
 
     let type = document.querySelector('button.active').innerText;
 
-    buttons.forEach(button => {
-        button.addEventListener('click', ()=> {
-            buttons.forEach(el=>el.classList.remove('active'))
-            button.classList.add('active')
-            type = button.innerText
-            input.value = ''
-            output.value = ''
-            inputCounter.innerHTML = 0;
-            outputCounter.innerHTML = 0;
-        })
-    })
-
-    input.addEventListener('input', () => {
+    const update = () => {
         if (input.value === '') {
             output.value = '';
         } else {
@@ -84,10 +121,26 @@
 
         inputCounter.innerHTML = [...input.value].length;
         outputCounter.innerHTML = [...output.value].length;
+    }
+    buttons.forEach(button => {
+        button.addEventListener('click', () => {
+            buttons.forEach(el => el.classList.remove('active'))
+            button.classList.add('active')
+            type = button.innerText
+            output.value = ''
+            outputCounter.innerHTML = 0;
 
+            update()
+        })
     })
 
-    output.addEventListener('click', (e)=> {
+    input.addEventListener('input', () => {
+        update()
+    })
+
+
+
+    output.addEventListener('click', (e) => {
         if (!info.classList.contains('visible')) {
             output.select();
             document.execCommand("copy");
@@ -100,7 +153,172 @@
         setTimeout(() => info.classList.toggle('visible'), duration)
     }
 </script>
+<script src="regPack/contextDescriptor_browser.js"></script>
+<script src="regPack/stringHelper.js"></script>
+<script src="regPack/packerData.js"></script>
+<script src="regPack/shapeShifter.js"></script>
+<script src="regPack/regPack.js"></script>
+<script src="regPack/patternViewer.js"></script>
 
+<script>
+    var outputCode = [];
+
+    function doRegPack() {
+
+        for (var j = 0; j < 3; ++j) {
+            document.getElementById("stage" + j + "Output").value = "";
+        }
+
+        // Get rid of comments and empty lines
+        let code = input.value.replace(/([\r\n]|^)\s*\/\/.*|[\r\n]+\s*/g, '');
+        var options = {
+            crushGainFactor: parseFloat(document.getElementById("paramFGain").value),
+            crushLengthFactor: parseFloat(document.getElementById("paramFLength").value),
+            crushCopiesFactor: parseFloat(document.getElementById("paramFCopies").value),
+            crushTiebreakerFactor: parseInt(document.getElementById("paramFTiebreaker").value),
+            useES6: true
+        };
+
+        var originalLength = packer.getByteLength(code);
+        var inputList = packer.runPacker(code, options);
+        var methodCount = inputList.length;
+        var patternViewer = new PatternViewer;
+
+        var bestMethod = 0, bestStage = 0, bestCompression = 1e8;
+        for (var i = 0; i < methodCount; ++i) {
+            var packerData = inputList[i];
+            for (var j = 0; j < 4; ++j) {
+                var output = (j == 0 ? packerData.contents : packerData.result[j - 1][1]);
+                var packedLength = packer.getByteLength(output);
+                if (packedLength < bestCompression) {
+                    bestCompression = packedLength;
+                    bestMethod = i;
+                    bestStage = j;
+                }
+            }
+        }
+
+        var bestOutput = inputList[bestMethod];
+        document.getElementById("stage0Message").innerHTML = resultMessage(originalLength, packer.getByteLength(bestOutput.contents));
+        var outputField = document.getElementById("stage0Output");
+        while (outputField.lastChild) {
+            outputField.removeChild(outputField.lastChild);
+        }
+        outputField.appendChild(patternViewer.render(bestOutput.contents, bestOutput.matchesLookup));
+
+        for (var j = 1; j < 3; ++j) {
+            var stage = j < 2 ? j - 1 : (packer.getByteLength(bestOutput.result[1][1]) < packer.getByteLength(bestOutput.result[2][1]) ? 1 : 2);
+            outputCode[j] = bestOutput.result[stage][1];
+            var outputLength = packer.getByteLength(outputCode[j]);
+            document.getElementById("stage" + j + "Title").setAttribute("class", bestCompression == outputLength ? "bestMessage" : "");
+            document.getElementById("stage" + j + "Message").innerHTML = resultMessage(originalLength, outputLength);
+            document.getElementById("stage" + j + "Message").setAttribute("class", bestCompression == outputLength ? "bestMessage" : "");
+            document.getElementById("stage" + j + "Base64").onclick = function (index) {
+                return function () {
+                    // #52 : use StringHelper implementation instead of btoa() to handle Unicode characters > 255
+                    document.getElementById("stage" + index + "Output").value = this.checked ? StringHelper.getInstance().unicodeToBase64(outputCode[index]) : outputCode[index];
+                };
+            }(j);
+            document.getElementById("stage" + j + "Base64").onclick();	// set the textarea contents, raw or base64
+
+            // highlight best result in green
+            document.getElementById("stage" + j + "Output").setAttribute("class", bestCompression == outputLength ? "best" : "");
+        }
+    }
+
+
+    document.getElementById("packAction").onclick = function () {
+        doRegPack();
+    }
+
+</script>
+<script>
+    // REGPACK UTILS
+
+    // TEST ALL CASES
+
+
+    const MAX = 10
+    const DELAY = 50
+
+    const gainInput = document.querySelector('#paramFGain')
+    const lengthInput = document.querySelector('#paramFLength')
+    const copiesInput = document.querySelector('#paramFCopies')
+    const outputEl = document.querySelector('#stage1Output')
+    const buttonEl = document.querySelector('#packAction')
+    const triggerTest = document.querySelector('#testAllCases')
+    const replaceNums = document.querySelector('#replaceNums')
+
+    const delay = () => new Promise(resolve => setTimeout(resolve, DELAY))
+
+    async function main () {
+        const solutions = []
+
+        for (let gain = 0; gain < MAX; gain++) {
+            for (let length = 0; length < MAX; length++) {
+                for (let copies = 0; copies < MAX; copies++) {
+                    gainInput.value = gain
+                    lengthInput.value = length
+                    copiesInput.value = copies
+                    buttonEl.click()
+                    await delay()
+                    console.log(gain, length, copies)
+                    solutions.push({
+                        str: outputEl.value,
+                        strLength: outputEl.value.length,
+                        gain,
+                        length,
+                        copies
+                    })
+                }
+            }
+        }
+
+        return solutions
+    }
+
+    triggerTest.addEventListener('click', () => {
+        if (!window.progress) {
+            window.progress = true
+
+            main().then(solutions => {
+                solutions.sort((a,b) => a.strLength - b.strLength)
+                console.log(solutions)
+                window.progress = false
+            })
+        }
+    })
+
+    // FIX REGPACK
+
+    function fixRegPack (str) {
+        const begin = str.substring(0,2)
+        const test = str.substring(2)
+        const nrs = [...'536870912']
+        let separator = '")with';
+        if (str.indexOf(separator) < 0) {
+            separator = "')with";
+        }
+
+        let [str1, str2] = test.split(separator)
+        let index = str1.length - nrs.length
+
+        nrs.forEach((nr, i) => {
+            const regexp = new RegExp(`[${str1[index + i]}]`, 'g')
+            console.log(regexp, nr)
+            str1 = str1.replace(regexp, nr)
+        })
+
+        str = begin + str1 + separator + str2
+
+        return str.replace(/536870912"/, '"+2**29')
+    }
+
+    replaceNums.addEventListener('click', ()=> {
+        outputEl.value = fixRegPack(outputEl.value)
+    })
+
+</script>
 
 </body>
 </html>
