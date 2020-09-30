@@ -9,16 +9,15 @@
 </head>
 <body>
 <div>
-    <style>
-        .active {
-            color: blue;
-        }
-    </style>
-    <button class="active">Text</button>
+
+    <button class="active">Two-One</button>
+    <button>Three-One</button>
+    <button>Four-One</button>
     <button>Numbers</button>
 </div>
 <div>
     <p>Beware Numbers option - it adds some zeros to the end, and sometimes not work</p>
+    <p>Four-One - problem with \n</p>
 </div>
 <div>
     <div class="counter">0</div>
@@ -26,11 +25,11 @@
 </div>
 <div>
     <div class="counter">0</div>
-    <textarea id="output" cols="100" rows="20" placeholder="Output"></textarea>
+    <textarea id="output" cols="100" rows="20" placeholder="Output" readonly></textarea>
 </div>
 
 <script src="dist/javascript-parser.min.js" type="text/javascript"></script>
-
+<div class="info">Copied!</div>
 <script>
     const input = document.querySelector('#input');
     const inputCounter = input.parentNode.querySelector('.counter');
@@ -38,8 +37,10 @@
     const outputCounter = output.parentNode.querySelector('.counter');
 
     const buttons = document.querySelectorAll('button');
+    const info = document.querySelector('.info');
 
-    let type = 'Text';
+
+    let type = document.querySelector('button.active').innerText;
 
     buttons.forEach(button => {
         button.addEventListener('click', ()=> {
@@ -48,6 +49,8 @@
             type = button.innerText
             input.value = ''
             output.value = ''
+            inputCounter.innerHTML = 0;
+            outputCounter.innerHTML = 0;
         })
     })
 
@@ -62,6 +65,42 @@
         outputCounter.innerHTML = [...output.value].length;
 
     })
+
+    output.addEventListener('click', (e)=> {
+        if (!info.classList.contains('visible')) {
+            output.select();
+            document.execCommand("copy");
+            showInfo();
+        }
+    })
+
+    const showInfo = (duration = 3000) => {
+        info.classList.toggle('visible');
+        setTimeout(() => info.classList.toggle('visible'), duration)
+    }
 </script>
+
+<style>
+    .active {
+        color: blue;
+    }
+
+    .info {
+        position: fixed;
+        bottom: 30px;
+        right: 50%;
+        background: #0A6969;
+        color: #f8f8f8;
+        padding: 15px;
+        opacity: 0;
+        visibility: hidden;
+        transition: .3s all;
+    }
+
+    .info.visible {
+        opacity: 1;
+        visibility: visible;
+    }
+</style>
 </body>
 </html>
