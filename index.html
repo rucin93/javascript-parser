@@ -8,8 +8,29 @@
     <title>Text / numbers decoder</title>
 </head>
 <body>
-<div>
+<style>
+    .active {
+        color: blue;
+    }
 
+    .info {
+        position: fixed;
+        bottom: 30px;
+        right: 50%;
+        background: #0A6969;
+        color: #f8f8f8;
+        padding: 15px;
+        opacity: 0;
+        visibility: hidden;
+        transition: .3s all;
+    }
+
+    .info.visible {
+        opacity: 1;
+        visibility: visible;
+    }
+</style>
+<div>
     <button class="active">Two-One</button>
     <button>Three-One</button>
     <button>Four-One</button>
@@ -80,27 +101,6 @@
     }
 </script>
 
-<style>
-    .active {
-        color: blue;
-    }
 
-    .info {
-        position: fixed;
-        bottom: 30px;
-        right: 50%;
-        background: #0A6969;
-        color: #f8f8f8;
-        padding: 15px;
-        opacity: 0;
-        visibility: hidden;
-        transition: .3s all;
-    }
-
-    .info.visible {
-        opacity: 1;
-        visibility: visible;
-    }
-</style>
 </body>
 </html>
