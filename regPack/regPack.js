@@ -3,52 +3,6 @@ if (typeof require !== 'undefined') {
     var StringHelper = require('./stringHelper');
     var ShapeShifter = require('./shapeShifter');
 }
-function resultMessage(sourceSize, resultSize)
-{
-	var message = sourceSize+'B';
-	var prefix = (resultSize>sourceSize?"+":"");
-	if (sourceSize!=resultSize) {
-		message+=' to '+resultSize+'B ('+prefix+(resultSize-sourceSize)+'B, '+prefix+(((resultSize-sourceSize)/sourceSize*1e4|0)/100)+'%)'
-	}
-	return message;
-}
-
-/**
- * Entry point when running RegPack from node.js, wrapper for the packer
- * It performs the packing, then returns the best compressed (autoextractible) string
- *
- * @param input A string containing the program to pack
- * @param options An object detailing the different options for the preprocessor and packer
- * @return A string containing the shortest compressed form of the input
- */
-function cmdRegPack(input, options) {
-
-	var originalLength = packer.getByteLength(input);
-	var inputList = packer.runPacker(input, options);
-	var methodCount = inputList.length;
-
-	var bestMethod=0, bestStage = 0, shortestLength=1e8;
-	for (var i=0; i<methodCount; ++i) {
-		var packerData = inputList[i];
-		for (var j=0; j<4; ++j) {
-			var output = (j==0 ? packerData.contents : packerData.result[j-1][1]);
-			var packedLength = packer.getByteLength(output);
-			if (packedLength < shortestLength) {
-				shortestLength = packedLength;
-				bestMethod = i;
-				bestStage = j;
-			}
-		}
-	}
-
-	var bestOutput = inputList[bestMethod];
-	var bestVal = (bestStage==0 ?  bestOutput.contents : bestOutput.result[bestStage-1][1]);
-	var mes = resultMessage(originalLength, shortestLength);
-
-	//console.log("packer:", inputList[bestMethod]);
-	console.warn("stats:", mes);
-	return bestVal;
-}
 
 /**
  * @constructor
@@ -111,8 +65,8 @@ RegPack.prototype = {
 			currentData.result.push(output);
 
 			// third stage : try a negated regexp instead
-			output = this.packToNegatedRegexpCharClass(currentData);
-			currentData.result.push(output);
+			// output = this.packToNegatedRegexpCharClass(currentData);
+			// currentData.result.push(output);
 
 
 		}
@@ -973,7 +927,6 @@ var packer = new RegPack();
 if (typeof require !== 'undefined') {
     module.exports = {
         RegPack: RegPack,
-        packer: packer,
-        cmdRegPack: cmdRegPack
+        packer: packer
     };
 }
