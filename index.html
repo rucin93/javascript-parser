@@ -200,7 +200,7 @@
         }
 
         var bestOutput = inputList[bestMethod];
-        document.getElementById("stage0Message").innerHTML = resultMessage(originalLength, packer.getByteLength(bestOutput.contents));
+        // document.getElementById("stage0Message").innerHTML = resultMessage(originalLength, packer.getByteLength(bestOutput.contents));
         var outputField = document.getElementById("stage0Output");
         while (outputField.lastChild) {
             outputField.removeChild(outputField.lastChild);
@@ -211,7 +211,7 @@
             outputCode[j] = bestOutput.result[0][1];
             var outputLength = packer.getByteLength(outputCode[j]);
             document.getElementById("stage" + j + "Title").setAttribute("class", bestCompression == outputLength ? "bestMessage" : "");
-            document.getElementById("stage" + j + "Message").innerHTML = resultMessage(originalLength, outputLength);
+            // document.getElementById("stage" + j + "Message").innerHTML = resultMessage(originalLength, outputLength);
             document.getElementById("stage" + j + "Message").setAttribute("class", bestCompression == outputLength ? "bestMessage" : "");
             document.getElementById("stage" + j + "Base64").onclick = function (index) {
                 return function () {
