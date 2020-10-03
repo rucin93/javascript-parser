@@ -81,14 +81,26 @@ function numbersParser(code: string): string {
     return rest !== 0 ? result + `;m=m.slice(0,-${spreadSize - rest})` : result
 }
 
+function numbersV2(code: string): string {
+    let n = BigInt(code);
+    const f = 1n << 20n;
+    let s = []
+    for (; n; n = n / f | 0n) s.unshift(String.fromCodePoint(Number(n % f)))
+    return `n=0n
+for(a of"${s.join(``)}")n=n<<20n|BigInt(a.codePointAt())
+print(n)`
+}
+
 export default function parseCode(code: string, type: string): string {
     let result = '';
     if (type.toUpperCase() === 'NUMBERS') {
         result = numbersParser(code);
-    } else if (type.toUpperCase() === 'TWO-ONE'){
+    } else if (type.toUpperCase() === 'TWO-ONE') {
         result = chineseMarks(code)
-    } else if (type.toUpperCase() === 'FOUR-ONE'){
+    } else if (type.toUpperCase() === 'FOUR-ONE') {
         result = enhancedTextParser(code)
+    } else if (type.toUpperCase() === 'NUMBERSV2') {
+        result = numbersV2(code)
     } else {
         result = anotherTextParser(code);
     }
