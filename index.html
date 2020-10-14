@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Text / numbers decoder</title>
 </head>
-<body>
+<body style="display:none">
 <style>
     .active {
         color: blue;
@@ -41,6 +41,7 @@
     <button>Four-One</button>
     <button>Numbers</button>
     <button>Numbersv2</button>
+    <button>Numbersv3</button>
 </nav>
 <section>
 
@@ -98,6 +99,61 @@
             <br><textarea cols="70" rows="20" id="stage2Output"></textarea><br>
         </div>
     </div>
+</div>
+<div id="bruteForce">
+    <h2>BruteForce</h2>
+    <textarea cols="70" rows="20" id="codeToFlood" placeholder="code here"></textarea><br>
+    number of tries: <br>
+    <input id="numberOfTries" type="number"> <br>
+    hole name: <br>
+    <input id="holeName" type="text"> <br>
+    <button id="startFlood">Start</button>
+
+    <script>
+        // const brute = document.getElementById('bruteForce');
+        const startFlood = document.getElementById('startFlood');
+        const code = document.getElementById('codeToFlood');
+        const holeName = document.getElementById('holeName');
+        const numberOfTries = document.getElementById('numberOfTries');
+
+        const flood = (stopAt = 1000) => {
+            let i=0
+            let body = {
+                Code: JSON.stringify(code.value),
+                Hole: holeName.value,
+                Lang: 'javascript'
+            };
+
+
+            const x = setInterval(() => {
+                fetch("https://code.golf/solution", {
+                    "headers": {
+                        "accept": "*/*",
+                        "accept-language": "pl-PL,pl;q=0.9,en-US;q=0.8,en;q=0.7,es;q=0.6,la;q=0.5",
+                        "cache-control": "no-cache",
+                        "content-type": "text/plain;charset=UTF-8",
+                        "pragma": "no-cache",
+                        "sec-fetch-dest": "empty",
+                        "sec-fetch-mode": "cors",
+                        "sec-fetch-site": "same-origin"
+                    },
+                    "referrerPolicy": "no-referrer",
+                    "body": body,
+                    "method": "POST",
+                    "mode": "cors",
+                    "credentials": "include"
+                }).then(res=> res.json().then(d=>{
+                    if(d.passed || i === stopAt) {stop();console.log('stopped at' + i + i === stopAt ? ' because of fail :/' : ' because of pass :)' )}
+                    console.log(i++);
+                }));
+
+            }, 500);
+
+            const stop = () => clearInterval(x)
+        }
+
+        startFlood.addEventListener('click', () => flood(numberOfTries.value))
+    </script>
 </div>
 
 </section>
