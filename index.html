@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Text / numbers decoder</title>
 </head>
-<body style="display:none">
+<body >
 <style>
     .active {
         color: blue;
@@ -178,8 +178,8 @@
             output.value = jsParser(input.value, type)
         }
 
-        inputCounter.innerHTML = [...input.value].length;
-        outputCounter.innerHTML = [...output.value].length;
+        inputCounter.innerHTML = "Chars: " + [...input.value].length + ' Bytes: ' + byteSize(input.value);
+        outputCounter.innerHTML = "Chars: " + [...output.value].length + ' Bytes: ' + byteSize(output.value);
     }
     buttons.forEach(button => {
         button.addEventListener('click', () => {
@@ -387,6 +387,38 @@
     })
 
 
+
+</script>
+
+<script>
+
+    byteSize = str => new Blob([str]).size;
+    yetAnotherTextParser = (code, m = 94,r = 15, hex=false) => {
+        let result = '';
+        if (code.length % 2) { code = '0' + code; }
+        let bn = hex ? BigInt('0x' + code.toUpperCase()) : BigInt(code);
+
+        for (let v = bn; v|0n; v/=BigInt(m)) result += String.fromCharCode((v % BigInt(m) + BigInt(r)).toString(10));
+
+        return `e=0n;for(n of\`${result.split``.reverse().join``.replace(/(\\.)/g, '\\$1').replace(/\`/g, '\\`')}\`)e=e*${m}n+BigInt(n.charCodeAt()-${r})`
+    }
+
+    tryMore = (code, hex=false) => {
+        let x=Infinity
+
+
+
+        for(i=88;i<150;i++){
+            for(j=14;j<150;j++){
+                const asd=yetAnotherTextParser(code,i,j, hex)
+
+                if(byteSize(asd) < x){
+                    x=byteSize(asd)
+                    console.log(i,j,x)
+                }
+            }
+        }
+    }
 
 </script>
 
