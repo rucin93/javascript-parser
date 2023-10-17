@@ -229,7 +229,7 @@
         }
 
         // Get rid of comments and empty lines
-        let code = input.value.replace(/([\r\n]|^)\s*\/\/.*|[\r\n]+\s*/g, '');
+        let code = input.value;
         var options = {
             crushGainFactor: parseFloat(document.getElementById("paramFGain").value),
             crushLengthFactor: parseFloat(document.getElementById("paramFLength").value),
