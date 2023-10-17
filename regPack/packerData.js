@@ -27,7 +27,7 @@ function PackerData(name, dataString) {
 	this.packedCodeVarName='_'; // name of the variable created to hold the packed code
 	this.containedStrings=[]; // all strings inside the input code
 	this.containedTemplateLiterals=[]; // all template literals `${...}` inside a string
-	this.packedStringDelimiter='"'; // ', " or ` around the packed string
+	this.packedStringDelimiter='`'; // ', " or ` around the packed string
 	this.thermalMapping=[]; // strings mapping for each compression step, including preprocessing
 	this.result= new Array;
 }

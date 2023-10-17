@@ -119,7 +119,7 @@ RegPack.prototype = {
 		details='';
 		// #55 : 34(") and 39(') now allowed, as long as they are not the chosen delimiter
 		var delimiterCode = packerData.packedStringDelimiter.charCodeAt(0);
-		var Q=[];for(var i=0;++i<127;i-10&&i-13&&i-delimiterCode&&i-92&&Q.push(String.fromCharCode(i)));
+		var Q=[];for(var i=0;++i<127;i-96&&i-13&&i-delimiterCode&&i-92&&Q.push(String.fromCharCode(i)));
 		var matches = {};
 		for(var tokens='';;tokens=c+tokens) {
 			for(var c=0,i=122;!c&&--i;!~s.indexOf(Q[i])&&(c=Q[i]));
@@ -338,7 +338,7 @@ RegPack.prototype = {
 				if (firstInLine >-1) {
 					// do not start a block with CR nor LF, as the first character of the block
 					// needs to be written to the regexp and those are not writable (or require escaping)
-					if (firstInLine == 10 || firstInLine == 13) {
+					if (firstInLine == 13) {
 						++firstInLine;
 					}
 					var lastInLine = i-1;
@@ -372,7 +372,7 @@ RegPack.prototype = {
 		var costOneTokens = [], costTwoTokens = [];
 		for (var tokenLine=0; tokenLine<tokenList.length; ++tokenLine) {
 			for (var i=tokenList[tokenLine].first; i<=tokenList[tokenLine].last; ++i) {
-				if (i!=10 && i!=13) {
+				if (i!=13) {
 					if (i==92) {
 						costTwoTokens.push(i);
 					} else {
@@ -668,7 +668,7 @@ RegPack.prototype = {
 	 */
 	isForbiddenCharacter : function(ascii)
 	{
-		return ascii==10||ascii==13||ascii==127;
+		return ascii==13||ascii==127;
 	},
 
 	/**

@@ -1881,12 +1881,12 @@ ShapeShifter.prototype = {
 	 */
 	quoteStrings : function (inputData, options) {
 		// candidate delimiters
-		var allDelimiters = [ "'", '"' ];
+		var allDelimiters = [ "'", '"', "`" ];
 		if (options.useES6) {
 			allDelimiters.push("`");
 		}
 		
-		var bestCost = 999, bestDelimiter = '"', bestNewStringQuotes = 0;
+		var bestCost = 999, bestDelimiter = '`', bestNewStringQuotes = 0;
 		var details = "\Wrapping packed code in :\n";
 		for (var delimiter of allDelimiters) {
 			var cost = 0;
@@ -1896,7 +1896,7 @@ ShapeShifter.prototype = {
 				cost += inputData.containedStrings[i].characterCount[delimCode] + (inputData.containedStrings[i].delimiter==delimCode ? 2 : 0);
 				
 				var bestNewQuote = String.fromCharCode(inputData.containedStrings[i].delimiter);
-				if (inputData.containedStrings[i].delimiter != 96) {
+				// if (inputData.containedStrings[i].delimiter != 96) {
 					// Attempt to regain bytes by changing the string delimiter 
 					// only if it is ' or ", not ` as this would disable template literals
 					//  - gain all escapes from current delimiter being present inside the string
@@ -1904,7 +1904,7 @@ ShapeShifter.prototype = {
 					//  - lose 1 for each copy of the new delimiter within the string
 					//  - lose 2 if the new string delimiter matches the chosen one for the packed string (as it will have to be escaped)
 					var bestStringGain = 0; 
-					var allStringDelimiters = [ "'", '"' ];
+					var allStringDelimiters = [ "'", '"', "`" ];
 					// only allow ` as delimiter if both ES6 flag is on, and the string does not contain "${"
 					// (as it would be mistaken for an expression placeholder)
 					var placeholderIndex = inputData.contents.indexOf("${", inputData.containedStrings[i].begin);
@@ -1929,7 +1929,7 @@ ShapeShifter.prototype = {
 					}
 					
 					cost -= bestStringGain;
-				}
+				// }
 				newStringQuotes.push(bestNewQuote);
 			}
 								
@@ -1940,7 +1940,8 @@ ShapeShifter.prototype = {
 				bestNewStringQuotes = newStringQuotes.slice();
 			}
 		}
-		inputData.packedStringDelimiter = bestDelimiter;
+		inputData.packedStringDelimiter = "`";
+		// inputData.packedStringDelimiter = bestDelimiter;
 		
 		// perform replacement in strings
 		// we cannot use stringHelper.matchAndReplaceAll() as only some instances of the string are replaced in the code

@@ -245,7 +245,7 @@ var StringHelper = (function() {
 		 * @return true if a backslash is needed, false otherwise
 		 */
 		this.needsEscapingInCharClass = function(ascii) {
-			return ascii==92||ascii==93;
+			return ascii==92||ascii==93||ascii==96;
 		}
 		
 	}

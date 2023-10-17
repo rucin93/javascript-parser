@@ -160,6 +160,8 @@
 <script src="dist/javascript-parser.min.js" type="text/javascript"></script>
 <div class="info">Copied!</div>
 <script>
+    byteSize = str => new Blob([str]).size;
+
     const input = document.querySelector('#input');
     const inputCounter = input.parentNode.querySelector('.counter');
     const output = document.querySelector('#output');
@@ -222,70 +224,50 @@
 <script>
     var outputCode = [];
 
-    function doRegPack() {
-
-        for (var j = 0; j < 3; ++j) {
-            document.getElementById("stage" + j + "Output").value = "";
-        }
-
+    function doRegPack({gain, length, copies, tiebreaker}) {
         // Get rid of comments and empty lines
         let code = input.value;
         var options = {
-            crushGainFactor: parseFloat(document.getElementById("paramFGain").value),
-            crushLengthFactor: parseFloat(document.getElementById("paramFLength").value),
-            crushCopiesFactor: parseFloat(document.getElementById("paramFCopies").value),
-            crushTiebreakerFactor: parseInt(document.getElementById("paramFTiebreaker").value),
+            crushGainFactor: gain || 0,
+            crushLengthFactor: length || 0,
+            crushCopiesFactor: copies || 0,
+            crushTiebreakerFactor: tiebreaker || 1,
             useES6: true
         };
 
-        var originalLength = packer.getByteLength(code);
+        var originalLength = byteSize(code);
         var inputList = packer.runPacker(code, options);
-        var methodCount = inputList.length-1;
+        var methodCount = inputList.length - 1;
 
-        var bestMethod = 0, bestStage = 0, bestCompression = 1e8;
-        for (var i = 0; i < methodCount; ++i) {
-            var packerData = inputList[i];
-            for (var j = 0; j < 4; ++j) {
-                var output = (j == 0 ? packerData.contents : packerData.result[j - 1][1]);
-                var packedLength = packer.getByteLength(output);
+        var bestMethod = 0, bestStage = 0, bestCompression = Infinity, bestOutput = "";
+        for (var i = 0; i <= methodCount; ++i) {
+            var {result} = inputList[i] || null;
+            if(!result) continue;
+
+            const outputs = [...result.map(e=>e[1])];
+            outputs.forEach((output, j) => {
+                var packedLength = byteSize(output);
                 if (packedLength < bestCompression) {
                     bestCompression = packedLength;
-                    bestMethod = i;
-                    bestStage = j;
+                    bestOutput = output;
                 }
-            }
+            })
         }
 
-        var bestOutput = inputList[bestMethod];
-        // document.getElementById("stage0Message").innerHTML = resultMessage(originalLength, packer.getByteLength(bestOutput.contents));
-        var outputField = document.getElementById("stage0Output");
-        while (outputField.lastChild) {
-            outputField.removeChild(outputField.lastChild);
-        }
+        // console.log(bestOutput)
+        // document.getElementById("stage1Output").value = bestOutput;
 
-        for (var j = 1; j < 3; ++j) {
-            console.log(bestOutput.result)
-            outputCode[j] = bestOutput.result[0][1];
-            var outputLength = packer.getByteLength(outputCode[j]);
-            document.getElementById("stage" + j + "Title").setAttribute("class", bestCompression == outputLength ? "bestMessage" : "");
-            // document.getElementById("stage" + j + "Message").innerHTML = resultMessage(originalLength, outputLength);
-            document.getElementById("stage" + j + "Message").setAttribute("class", bestCompression == outputLength ? "bestMessage" : "");
-            document.getElementById("stage" + j + "Base64").onclick = function (index) {
-                return function () {
-                    // #52 : use StringHelper implementation instead of btoa() to handle Unicode characters > 255
-                    document.getElementById("stage" + index + "Output").value = this.checked ? StringHelper.getInstance().unicodeToBase64(outputCode[index]) : outputCode[index];
-                };
-            }(j);
-            document.getElementById("stage" + j + "Base64").onclick();	// set the textarea contents, raw or base64
-
-            // highlight best result in green
-            document.getElementById("stage" + j + "Output").setAttribute("class", bestCompression == outputLength ? "best" : "");
-        }
+        return bestOutput;
     }
 
 
     document.getElementById("packAction").onclick = function () {
-        doRegPack();
+        document.getElementById("stage1Output").value = doRegPack({
+            gain: parseFloat(document.getElementById("paramFGain").value),
+            length: parseFloat(document.getElementById("paramFLength").value),
+            copies: parseFloat(document.getElementById("paramFCopies").value),
+            tiebreaker: parseInt(document.getElementById("paramFTiebreaker").value)
+        });
     }
 
 </script>
@@ -296,7 +278,6 @@
 
 
     const MAX = 10
-    const DELAY = 50
 
     const gainInput = document.querySelector('#paramFGain')
     const lengthInput = document.querySelector('#paramFLength')
@@ -308,43 +289,36 @@
     const replaceEval = document.querySelector('#replaceEval')
     const bitCrusherBtn = document.querySelector('#bitCrusher')
 
-    const delay = () => new Promise(resolve => setTimeout(resolve, DELAY))
 
-    async function main () {
-        const solutions = []
-
-        for (let gain = 0; gain < MAX; gain++) {
-            for (let length = 0; length < MAX; length++) {
-                for (let copies = 0; copies < MAX; copies++) {
-                    gainInput.value = gain
-                    lengthInput.value = length
-                    copiesInput.value = copies
-                    buttonEl.click()
-                    await delay()
-                    solutions.push({
-                        str: outputEl.value,
-                        strLength: outputEl.value.length,
-                        gain,
-                        length,
-                        copies
-                    })
+    function main () {
+        setTimeout(() => {
+            const solutions = []
+            const all = MAX ** 3 * 2;
+            let i = 0;
+            for (let tiebreake = 1; tiebreake < 3; tiebreake++) {
+                for (let gain = 0; gain < MAX; gain++) {
+                    for (let length = 0; length < MAX; length++) {
+                        for (let copies = 0; copies < MAX; copies++) {
+                            solutions.push(doRegPack({gain, length, copies, tiebreaker: tiebreake}))
+                            console.log(`${i}/${all}`)
+                            i++;
+                        }
+                    }
                 }
             }
-        }
 
-        return solutions
+            const result = solutions.sort((a,b) => byteSize(a) - byteSize(b))
+            console.log('Best : ', result[0])
+            document.getElementById("stage1Output").value = result[0];
+            window.progress = false
+        },1)
+        
     }
 
     triggerTest.addEventListener('click', () => {
         if (!window.progress) {
             window.progress = true
-
-            main().then(solutions => {
-                solutions.sort((a,b) => a.strLength - b.strLength)
-                console.log('Best : ', solutions[0])
-                // console.log(solutions)
-                window.progress = false
-            })
+            main()
         }
     })
 
@@ -353,8 +327,8 @@
     function fixRegPack (str) {
         const begin = str.substring(0,2)
         const test = str.substring(2)
-        const nrs = [...'536870912']
-        let separator = '")with';
+        const nrs = [...`${2**29}`]
+        let separator = '`)with';
         if (str.indexOf(separator) < 0) {
             separator = "')with";
         }
@@ -370,7 +344,7 @@
 
         str = begin + str1 + separator + str2
 
-        return str.replace(/536870912"/, '"+2**29')
+        return str.replace(/536870912`/, '`+2**29')
     }
 
     replaceNums.addEventListener('click', ()=> {
@@ -392,7 +366,6 @@
 
 <script>
 
-    byteSize = str => new Blob([str]).size;
     yetAnotherTextParser = (code, m = 94,r = 15, hex=false) => {
         let result = '';
         if (code.length % 2) { code = '0' + code; }
