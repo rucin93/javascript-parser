@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Civet helper</title>
+    <style>
+        textarea {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Civet helper</h1>
+    <p>If you want to do 2:1 or 3:1 - use JS syntax, because civet eval is not handling civet inside. Also don't forget to remove new lines when 3:1 and higher utf chars.</p>
+    <textarea id="input" cols="70" rows="20" style="margin-bottom: 50px;" placeholder="Input" data-np-intersection-state="visible"></textarea>
+    <button id="minify">Minify</button>
+    <button id="chars">Replace Operators with UTF chars</button>
+    <textarea id="output" cols="70" rows="20" placeholder="Output" readonly=""></textarea>
+
+    <script>
+        const code = document.getElementById('input');
+        const output = document.getElementById('output');
+        const minify = document.getElementById('minify');
+        const chars = document.getElementById('chars');
+
+
+        minify.addEventListener('click', () => {
+            let result = code.value;
+            result = result.replace(/print/g, 'console.log');
+            result = "w=process.stdout@write;"+result.replace(/write/g, 'w');
+
+            if(result.length > 226) {
+                // 3:1 
+                result = largeTextParser(result);
+            } else if(result.length > 85) {
+                // 2:1
+                result = chineseMarks(result);
+            } else {
+                // 1:1 - do nothing
+            }
+            output.value = result;
+        });
+
+        chars.addEventListener('click', () => {
+            let result = code.value;
+            result = replaceAsciiWithSpecialChars(result);
+            output.value = result;
+        });
+
+        function largeTextParser(code) {
+            let u = ''
+            const m = 95
+            const r = 32
+            const mod = (n, m) => (n % m + m) % m
+            code = ';' + code.replace(/(\r\n|\n|\r)/gm, '\\n');
+            code += '//';
+            code += ' '.repeat(code.length * 2 % 3)
+            const step = code.length / 3
+            for (let i = 0; i < step; i++) {
+                const [a, b, c] = [code[i + 2 * step], code[i + step], code[i]].map(c => c.charCodeAt(0) - r)
+                const x = mod(a - b, m + 1) * m + a
+                let y = mod((m + 1) / 2 * (x - c), m + 2) * m * (m + 1) + x
+                if (y >= 0xD800 && y <= 0xDFFF) y += m * (m + 1) * (m + 2)
+                u += String.fromCodePoint(y)
+            }
+
+            return `for$=98;$--;for(c of\`${u}\`)#+=Buffer [c.codePointAt()%i+32];eval #`
+        }
+
+
+        function replaceAsciiWithSpecialChars(inputString) {
+            const replacements = {
+                "<=": "≤",
+                ">=": "≥",
+                "!=": "≠",
+                "==": "≡",
+                "===": "≣",
+                "!==": "≢",
+                ":=": "≔",
+                "??": "⁇",
+                "||": "‖",
+                "<<": "≪",
+                ">>": "≫",
+                ">>>": "⋙",
+                "...": "…",
+                "..": "‥",
+                "is in": "∈",
+                "is not in": "∉",
+                "|>": "▷",
+                "->": "→",
+                "=>": "⇒",
+                "'s": "’s",
+                "++": "⧺",
+                "--": "—",
+                "%/": "÷"
+            };
+
+            // Function to perform replacements within a given string
+            function performReplacements(str) {
+                const regex = new RegExp(`\\b(${Object.keys(replacements).map(key => key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\b`, 'g');
+                return str.replace(regex, match => replacements[match]);
+            }
+
+            // Function to handle replacements within template tags
+            function replaceInTemplateTags(str) {
+                return str.replace(/\$\{([^}]*)\}/g, (match, p1) => {
+                    return `\$\{${performReplacements(p1)}\}`;
+                });
+            }
+
+            // Split the input string by template tags
+            const parts = inputString.split(/(\$\{[^}]*\})/g);
+
+            // Apply replacements outside of template tags
+            for (let i = 0; i < parts.length; i++) {
+                if (!parts[i].startsWith("${")) {
+                    parts[i] = performReplacements(parts[i]);
+                } else {
+                    parts[i] = replaceInTemplateTags(parts[i]);
+                }
+            }
+
+            // Join the parts back together
+            return parts.join('');
+        }
+
+
+
+        function chineseMarks(code) {
+            const compressAscii = (code) => {
+                let c = "";
+                if (code.length % 2) code += " ";
+                const f = String.fromCharCode;
+                const e = "charCodeAt";
+                for (let a = 0; code.length > a; a += 2) c += f(55296 + code[e](a)) + f(56320 + code[e](a + 1));
+                return c
+            };
+
+            return "eval unescape escape`" + compressAscii(code) + "`.replace(/u../g,'')";
+        }
+    </script>
+</body>
+</html>
