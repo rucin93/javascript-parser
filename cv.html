@@ -98,7 +98,7 @@
 
             // Function to perform replacements within a given string
             function performReplacements(str) {
-                const regex = new RegExp(`\\b(${Object.keys(replacements).map(key => key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\b`, 'g');
+                const regex = new RegExp(`(${Object.keys(replacements).map(key => key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'g');
                 return str.replace(regex, match => replacements[match]);
             }
 
