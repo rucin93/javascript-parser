@@ -1,1 +1,1 @@
-Bunch of helper tools to be used on https://code.golf website
+Bunch of tools to be used on https://code.golf website
