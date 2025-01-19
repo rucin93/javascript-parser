@@ -1,400 +1,469 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Text / numbers decoder</title>
-</head>
-<body >
-<style>
-    .active {
+  </head>
+  <body>
+    <style>
+      .active {
         color: blue;
-    }
+      }
 
-    .info {
+      .info {
         position: fixed;
         bottom: 30px;
         right: 50%;
-        background: #0A6969;
+        background: #0a6969;
         color: #f8f8f8;
         padding: 15px;
         opacity: 0;
         visibility: hidden;
-        transition: .3s all;
-    }
+        transition: 0.3s all;
+      }
 
-    .info.visible {
+      .info.visible {
         opacity: 1;
         visibility: visible;
-    }
+      }
 
-    section {
+      section {
         display: grid;
         grid-template-columns: 1fr 1fr;
-    }
-</style>
-<nav>
-    <button class="active">Two-One</button>
-    <button>Three-One</button>
-    <button>Four-One</button>
-    <button>Numbers</button>
-    <button>Numbersv2</button>
-    <button>Numbersv3</button>
-</nav>
-<section>
+      }
+    </style>
+    <nav>
+      <button class="active">Two-One</button>
+      <button>Two-One-Plus</button>
+      <button>Three-One</button>
+      <button>Four-One</button>
+      <button>Numbers</button>
+      <button>Numbersv2</button>
+      <button>Numbersv3</button>
+    </nav>
+    <section>
+      <div id="main">
+        <div>
+          <p>
+            Two-One - credits for Xem
+            <a href="https://xem.github.io/obfuscatweet-reloaded/"
+              >https://xem.github.io/obfuscatweet-reloaded/</a
+            >
+          </p>
+          <p>
+            Two-One-Plus - credits for LukeG
+            <a href="https://github.com/lukegustafson/jspacker_21plus"
+              >https://github.com/lukegustafson/jspacker_21plus</a
+            >
+          </p>
+          <p>Three-One - credits for romancortes</p>
+          <p>
+            Beware Numbers option - it adds some zeros to the end, and sometimes
+            not work
+          </p>
+          <p>Four-One - problem with \n</p>
+        </div>
 
-<div id="main">
-    <div>
-        <p>Beware Numbers option - it adds some zeros to the end, and sometimes not work</p>
-        <p>Four-One - problem with \n</p>
-    </div>
+        <div>
+          <div class="counter">0</div>
+          <textarea
+            id="input"
+            cols="70"
+            rows="20"
+            style="margin-bottom: 50px"
+            placeholder="Input"
+          ></textarea>
+        </div>
+        <div>
+          <div class="counter">0</div>
+          <textarea
+            id="output"
+            cols="70"
+            rows="20"
+            placeholder="Output"
+            readonly
+          ></textarea>
+        </div>
+      </div>
+      <div id="regPack">
+        <h2>RegPack</h2>
+        <br />
+        Score = <input type="text" size="6" value="1" id="paramFGain" /> *gain +
+        <input type="text" size="6" value="0" id="paramFLength" /> *length +
+        <input type="text" size="6" value="0" id="paramFCopies" /> *copies
+        &nbsp;&nbsp;&nbsp; Tiebreaker =
+        <select id="paramFTiebreaker">
+          <option value="1" selected>longest string first (Js Crush)</option>
+          <option value="-1">most copies first (First Crush)</option>
+        </select>
+        <br />
+        <br />
+        <button id="packAction">Pack</button>
+        <button id="testAllCases">testAllCases</button>
+        <button id="replaceNums">replace 2**29</button>
+        <button id="replaceEval">replace eval</button>
+        <button id="bitCrusher">bitCrusher</button>
+        <br />
+        <br />
 
-    <div>
-        <div class="counter">0</div>
-        <textarea id="input" cols="70" rows="20" style="margin-bottom: 50px" placeholder="Input"></textarea>
-    </div>
-    <div>
-        <div class="counter">0</div>
-        <textarea id="output" cols="70" rows="20" placeholder="Output" readonly></textarea>
-    </div>
-</div>
-<div id="regPack">
-    <h2>RegPack</h2>
-    <br>
-    Score = <input type="text" size=6 value=1 id="paramFGain"/>
-    *gain + <input type="text" size=6 value=0 id="paramFLength"/>
-    *length + <input type="text" size=6 value=0 id="paramFCopies"/>
-    *copies
-    &nbsp;&nbsp;&nbsp;
-
-    Tiebreaker = <select id="paramFTiebreaker">
-    <option value=1 selected>longest string first (Js Crush)</option>
-    <option value=-1>most copies first (First Crush)</option>
-</select>
-    <br>
-    <br>
-    <button id="packAction">Pack</button>
-    <button id="testAllCases">testAllCases</button>
-    <button id="replaceNums">replace 2**29</button>
-    <button id="replaceEval">replace eval</button>
-    <button id="bitCrusher">bitCrusher</button>
-    <br>
-    <br>
-
-    <div id="regPackOutput">
-        <div id="preprocessed" style="display: none">
+        <div id="regPackOutput">
+          <div id="preprocessed" style="display: none">
             <b id="stage0Title">Preprocessed : </b><b id="stage0Message"></b>
-            <br>
+            <br />
             <div id="stage0Output" class="textBox"></div>
-            <textarea cols="70" rows="20" id="stage0Details"></textarea><br>
+            <textarea cols="70" rows="20" id="stage0Details"></textarea><br />
+          </div>
+          <div id="crushed">
+            <b id="stage1Title">Crushed : </b><b id="stage1Message"></b
+            ><input type="checkbox" id="stage1Base64" />base64 <br /><textarea
+              cols="70"
+              rows="20"
+              id="stage1Output"
+            ></textarea
+            ><br />
+          </div>
+          <div id="packed" style="display: none">
+            <b id="stage2Title">RegPack'ed: </b><b id="stage2Message"></b
+            ><input type="checkbox" id="stage2Base64" />base64 <br /><textarea
+              cols="70"
+              rows="20"
+              id="stage2Output"
+            ></textarea
+            ><br />
+          </div>
         </div>
-        <div id="crushed">
-            <b id="stage1Title">Crushed : </b><b id="stage1Message"></b><input type="checkbox" id="stage1Base64"/>base64
-            <br><textarea cols="70" rows="20" id="stage1Output"></textarea><br>
-        </div>
-        <div id="packed" style="display: none">
-            <b id="stage2Title">RegPack'ed: </b><b id="stage2Message"></b><input type="checkbox" id="stage2Base64"/>base64
-            <br><textarea cols="70" rows="20" id="stage2Output"></textarea><br>
-        </div>
-    </div>
-</div>
-<div id="bruteForce" style="display: none">
-    <h2>BruteForce</h2>
-    <textarea cols="70" rows="20" id="codeToFlood" placeholder="code here"></textarea><br>
-    number of tries: <br>
-    <input id="numberOfTries" type="number"> <br>
-    hole name: <br>
-    <input id="holeName" type="text"> <br>
-    <button id="startFlood">Start</button>
+      </div>
+      <div id="bruteForce" style="display: none">
+        <h2>BruteForce</h2>
+        <textarea
+          cols="70"
+          rows="20"
+          id="codeToFlood"
+          placeholder="code here"
+        ></textarea
+        ><br />
+        number of tries: <br />
+        <input id="numberOfTries" type="number" /> <br />
+        hole name: <br />
+        <input id="holeName" type="text" /> <br />
+        <button id="startFlood">Start</button>
 
-    <script>
-        // const brute = document.getElementById('bruteForce');
-        const startFlood = document.getElementById('startFlood');
-        const code = document.getElementById('codeToFlood');
-        const holeName = document.getElementById('holeName');
-        const numberOfTries = document.getElementById('numberOfTries');
+        <script>
+          // const brute = document.getElementById('bruteForce');
+          const startFlood = document.getElementById('startFlood');
+          const code = document.getElementById('codeToFlood');
+          const holeName = document.getElementById('holeName');
+          const numberOfTries = document.getElementById('numberOfTries');
 
-        const flood = (stopAt = 1000) => {
-            let i=0
+          const flood = (stopAt = 1000) => {
+            let i = 0;
             let body = {
-                Code: JSON.stringify(code.value),
-                Hole: holeName.value,
-                Lang: 'javascript'
+              Code: JSON.stringify(code.value),
+              Hole: holeName.value,
+              Lang: 'javascript',
             };
 
-
             const x = setInterval(() => {
-                fetch("https://code.golf/solution", {
-                    "headers": {
-                        "accept": "*/*",
-                        "accept-language": "pl-PL,pl;q=0.9,en-US;q=0.8,en;q=0.7,es;q=0.6,la;q=0.5",
-                        "cache-control": "no-cache",
-                        "content-type": "text/plain;charset=UTF-8",
-                        "pragma": "no-cache",
-                        "sec-fetch-dest": "empty",
-                        "sec-fetch-mode": "cors",
-                        "sec-fetch-site": "same-origin"
-                    },
-                    "referrerPolicy": "no-referrer",
-                    "body": body,
-                    "method": "POST",
-                    "mode": "cors",
-                    "credentials": "include"
-                }).then(res=> res.json().then(d=>{
-                    if(d.passed || i === stopAt) {stop();console.log('stopped at' + i + i === stopAt ? ' because of fail :/' : ' because of pass :)' )}
-                    console.log(i++);
-                }));
-
+              fetch('https://code.golf/solution', {
+                headers: {
+                  accept: '*/*',
+                  'accept-language':
+                    'pl-PL,pl;q=0.9,en-US;q=0.8,en;q=0.7,es;q=0.6,la;q=0.5',
+                  'cache-control': 'no-cache',
+                  'content-type': 'text/plain;charset=UTF-8',
+                  pragma: 'no-cache',
+                  'sec-fetch-dest': 'empty',
+                  'sec-fetch-mode': 'cors',
+                  'sec-fetch-site': 'same-origin',
+                },
+                referrerPolicy: 'no-referrer',
+                body: body,
+                method: 'POST',
+                mode: 'cors',
+                credentials: 'include',
+              }).then((res) =>
+                res.json().then((d) => {
+                  if (d.passed || i === stopAt) {
+                    stop();
+                    console.log(
+                      'stopped at' + i + i === stopAt
+                        ? ' because of fail :/'
+                        : ' because of pass :)'
+                    );
+                  }
+                  console.log(i++);
+                })
+              );
             }, 500);
 
-            const stop = () => clearInterval(x)
-        }
+            const stop = () => clearInterval(x);
+          };
 
-        startFlood.addEventListener('click', () => flood(numberOfTries.value))
-    </script>
-</div>
+          startFlood.addEventListener('click', () =>
+            flood(numberOfTries.value)
+          );
+        </script>
+      </div>
+    </section>
+    <script src="dist/javascript-parser.min.js" type="text/javascript"></script>
+    <div class="info">Copied!</div>
+    <script>
+      byteSize = (str) => new Blob([str]).size;
 
-</section>
-<script src="dist/javascript-parser.min.js" type="text/javascript"></script>
-<div class="info">Copied!</div>
-<script>
-    byteSize = str => new Blob([str]).size;
+      const input = document.querySelector('#input');
+      const inputCounter = input.parentNode.querySelector('.counter');
+      const output = document.querySelector('#output');
+      const outputCounter = output.parentNode.querySelector('.counter');
 
-    const input = document.querySelector('#input');
-    const inputCounter = input.parentNode.querySelector('.counter');
-    const output = document.querySelector('#output');
-    const outputCounter = output.parentNode.querySelector('.counter');
+      const buttons = document.querySelectorAll('nav button');
+      const info = document.querySelector('.info');
 
-    const buttons = document.querySelectorAll('nav button');
-    const info = document.querySelector('.info');
+      let type = document.querySelector('button.active').innerText;
 
-
-    let type = document.querySelector('button.active').innerText;
-
-    const update = () => {
+      const update = () => {
         if (input.value === '') {
-            output.value = '';
+          output.value = '';
         } else {
-            output.value = jsParser(input.value, type)
+          console.log(type);
+          if (type.toLowerCase() === 'two-one-plus') {
+            output.value = twoOnePlus(input.value, true);
+          } else {
+            output.value = jsParser(input.value, type);
+          }
         }
 
-        inputCounter.innerHTML = "Chars: " + [...input.value].length + ' Bytes: ' + byteSize(input.value);
-        outputCounter.innerHTML = "Chars: " + [...output.value].length + ' Bytes: ' + byteSize(output.value);
-    }
-    buttons.forEach(button => {
+        inputCounter.innerHTML =
+          'Chars: ' +
+          [...input.value].length +
+          ' Bytes: ' +
+          byteSize(input.value);
+        outputCounter.innerHTML =
+          'Chars: ' +
+          [...output.value].length +
+          ' Bytes: ' +
+          byteSize(output.value);
+      };
+      buttons.forEach((button) => {
         button.addEventListener('click', () => {
-            buttons.forEach(el => el.classList.remove('active'))
-            button.classList.add('active')
-            type = button.innerText
-            output.value = ''
-            outputCounter.innerHTML = 0;
+          buttons.forEach((el) => el.classList.remove('active'));
+          button.classList.add('active');
+          type = button.innerText;
+          output.value = '';
+          outputCounter.innerHTML = 0;
 
-            update()
-        })
-    })
+          update();
+        });
+      });
 
-    input.addEventListener('input', () => {
-        update()
-    })
+      input.addEventListener('input', () => {
+        update();
+      });
 
-
-
-    output.addEventListener('click', (e) => {
+      output.addEventListener('click', (e) => {
         if (!info.classList.contains('visible')) {
-            output.select();
-            document.execCommand("copy");
-            showInfo();
+          output.select();
+          document.execCommand('copy');
+          showInfo();
         }
-    })
+      });
 
-    const showInfo = (duration = 3000) => {
+      const showInfo = (duration = 3000) => {
         info.classList.toggle('visible');
-        setTimeout(() => info.classList.toggle('visible'), duration)
-    }
-</script>
-<script src="regPack/contextDescriptor_browser.js"></script>
-<script src="regPack/stringHelper.js"></script>
-<script src="regPack/packerData.js"></script>
-<script src="regPack/shapeShifter.js"></script>
-<script src="regPack/regPack.js"></script>
-<script src="bitCrusher/bitCrusher.js"></script>
+        setTimeout(() => info.classList.toggle('visible'), duration);
+      };
+    </script>
+    <script src="regPack/contextDescriptor_browser.js"></script>
+    <script src="regPack/stringHelper.js"></script>
+    <script src="regPack/packerData.js"></script>
+    <script src="regPack/shapeShifter.js"></script>
+    <script src="regPack/regPack.js"></script>
+    <script src="bitCrusher/bitCrusher.js"></script>
+    <script src="two-one-plus/packer_21.js"></script>
 
-<script>
-    var outputCode = [];
+    <script>
+      var outputCode = [];
 
-    function doRegPack({gain, length, copies, tiebreaker}) {
+      function doRegPack({ gain, length, copies, tiebreaker }) {
         // Get rid of comments and empty lines
         let code = input.value;
         var options = {
-            crushGainFactor: gain || 0,
-            crushLengthFactor: length || 0,
-            crushCopiesFactor: copies || 0,
-            crushTiebreakerFactor: tiebreaker || 1,
-            useES6: true
+          crushGainFactor: gain || 0,
+          crushLengthFactor: length || 0,
+          crushCopiesFactor: copies || 0,
+          crushTiebreakerFactor: tiebreaker || 1,
+          useES6: true,
         };
 
         var originalLength = byteSize(code);
         var inputList = packer.runPacker(code, options);
         var methodCount = inputList.length - 1;
 
-        var bestMethod = 0, bestStage = 0, bestCompression = Infinity, bestOutput = "";
+        var bestMethod = 0,
+          bestStage = 0,
+          bestCompression = Infinity,
+          bestOutput = '';
         for (var i = 0; i <= methodCount; ++i) {
-            var {result} = inputList[i] || null;
-            if(!result) continue;
+          var { result } = inputList[i] || null;
+          if (!result) continue;
 
-            const outputs = [...result.map(e=>e[1])];
-            outputs.forEach((output, j) => {
-                var packedLength = byteSize(output);
-                if (packedLength < bestCompression) {
-                    bestCompression = packedLength;
-                    bestOutput = output;
-                }
-            })
+          const outputs = [...result.map((e) => e[1])];
+          outputs.forEach((output, j) => {
+            var packedLength = byteSize(output);
+            if (packedLength < bestCompression) {
+              bestCompression = packedLength;
+              bestOutput = output;
+            }
+          });
         }
 
         // console.log(bestOutput)
         // document.getElementById("stage1Output").value = bestOutput;
 
         return bestOutput;
-    }
+      }
 
-
-    document.getElementById("packAction").onclick = function () {
-        document.getElementById("stage1Output").value = doRegPack({
-            gain: parseFloat(document.getElementById("paramFGain").value),
-            length: parseFloat(document.getElementById("paramFLength").value),
-            copies: parseFloat(document.getElementById("paramFCopies").value),
-            tiebreaker: parseInt(document.getElementById("paramFTiebreaker").value)
+      document.getElementById('packAction').onclick = function () {
+        document.getElementById('stage1Output').value = doRegPack({
+          gain: parseFloat(document.getElementById('paramFGain').value),
+          length: parseFloat(document.getElementById('paramFLength').value),
+          copies: parseFloat(document.getElementById('paramFCopies').value),
+          tiebreaker: parseInt(
+            document.getElementById('paramFTiebreaker').value
+          ),
         });
-    }
+      };
+    </script>
+    <script>
+      // REGPACK UTILS
 
-</script>
-<script>
-    // REGPACK UTILS
+      // TEST ALL CASES
 
-    // TEST ALL CASES
+      const MAX = 10;
 
+      const gainInput = document.querySelector('#paramFGain');
+      const lengthInput = document.querySelector('#paramFLength');
+      const copiesInput = document.querySelector('#paramFCopies');
+      const outputEl = document.querySelector('#stage1Output');
+      const buttonEl = document.querySelector('#packAction');
+      const triggerTest = document.querySelector('#testAllCases');
+      const replaceNums = document.querySelector('#replaceNums');
+      const replaceEval = document.querySelector('#replaceEval');
+      const bitCrusherBtn = document.querySelector('#bitCrusher');
 
-    const MAX = 10
-
-    const gainInput = document.querySelector('#paramFGain')
-    const lengthInput = document.querySelector('#paramFLength')
-    const copiesInput = document.querySelector('#paramFCopies')
-    const outputEl = document.querySelector('#stage1Output')
-    const buttonEl = document.querySelector('#packAction')
-    const triggerTest = document.querySelector('#testAllCases')
-    const replaceNums = document.querySelector('#replaceNums')
-    const replaceEval = document.querySelector('#replaceEval')
-    const bitCrusherBtn = document.querySelector('#bitCrusher')
-
-
-    function main () {
+      function main() {
         setTimeout(() => {
-            const solutions = []
-            const all = MAX ** 3 * 2;
-            let i = 0;
-            for (let tiebreake = 1; tiebreake < 3; tiebreake++) {
-                for (let gain = 0; gain < MAX; gain++) {
-                    for (let length = 0; length < MAX; length++) {
-                        for (let copies = 0; copies < MAX; copies++) {
-                            solutions.push(doRegPack({gain, length, copies, tiebreaker: tiebreake}))
-                            console.log(`${i}/${all}`)
-                            i++;
-                        }
-                    }
+          const solutions = [];
+          const all = MAX ** 3 * 2;
+          let i = 0;
+          for (let tiebreake = 1; tiebreake < 3; tiebreake++) {
+            for (let gain = 0; gain < MAX; gain++) {
+              for (let length = 0; length < MAX; length++) {
+                for (let copies = 0; copies < MAX; copies++) {
+                  solutions.push(
+                    doRegPack({ gain, length, copies, tiebreaker: tiebreake })
+                  );
+                  console.log(`${i}/${all}`);
+                  i++;
                 }
+              }
             }
+          }
 
-            const result = solutions.sort((a,b) => byteSize(a) - byteSize(b))
-            console.log('Best : ', result[0])
-            document.getElementById("stage1Output").value = result[0];
-            window.progress = false
-        },1)
-        
-    }
+          const result = solutions.sort((a, b) => byteSize(a) - byteSize(b));
+          console.log('Best : ', result[0]);
+          document.getElementById('stage1Output').value = result[0];
+          window.progress = false;
+        }, 1);
+      }
 
-    triggerTest.addEventListener('click', () => {
+      triggerTest.addEventListener('click', () => {
         if (!window.progress) {
-            window.progress = true
-            main()
+          window.progress = true;
+          main();
         }
-    })
+      });
 
-    // FIX REGPACK
+      // FIX REGPACK
 
-    function fixRegPack (str) {
-        const begin = str.substring(0,2)
-        const test = str.substring(2)
-        const nrs = [...`${2**29}`]
+      function fixRegPack(str) {
+        const begin = str.substring(0, 2);
+        const test = str.substring(2);
+        const nrs = [...`${2 ** 29}`];
         let separator = '`)with';
         if (str.indexOf(separator) < 0) {
-            separator = "')with";
+          separator = "')with";
         }
 
-        let [str1, str2] = test.split(separator)
-        let index = str1.length - nrs.length
+        let [str1, str2] = test.split(separator);
+        let index = str1.length - nrs.length;
 
         nrs.forEach((nr, i) => {
-            const regexp = new RegExp(`[${str1[index + i]}]`, 'g')
-            console.log(regexp, nr)
-            str1 = str1.replace(regexp, nr)
-        })
+          const regexp = new RegExp(`[${str1[index + i]}]`, 'g');
+          console.log(regexp, nr);
+          str1 = str1.replace(regexp, nr);
+        });
 
-        str = begin + str1 + separator + str2
+        str = begin + str1 + separator + str2;
 
-        return str.replace(/536870912`/, '`+2**29')
-    }
+        return str.replace(/536870912`/, '`+2**29');
+      }
 
-    replaceNums.addEventListener('click', ()=> {
-        outputEl.value = fixRegPack(outputEl.value)
-    })
+      replaceNums.addEventListener('click', () => {
+        outputEl.value = fixRegPack(outputEl.value);
+      });
 
-    // bitCrusher
-    bitCrusherBtn.addEventListener('click', ()=> {
-        outputEl.value = bitCrusher(input.value)
-    })
+      // bitCrusher
+      bitCrusherBtn.addEventListener('click', () => {
+        outputEl.value = bitCrusher(input.value);
+      });
 
-    replaceEval.addEventListener('click', ()=> {
-        outputEl.value = outputEl.value.replace(/;eval/, ';print')
-    })
+      replaceEval.addEventListener('click', () => {
+        outputEl.value = outputEl.value.replace(/;eval/, ';print');
+      });
+    </script>
 
-
-
-</script>
-
-<script>
-
-    yetAnotherTextParser = (code, m = 94,r = 15, hex=false) => {
+    <script>
+      yetAnotherTextParser = (code, m = 94, r = 15, hex = false) => {
         let result = '';
-        if (code.length % 2) { code = '0' + code; }
+        if (code.length % 2) {
+          code = '0' + code;
+        }
         let bn = hex ? BigInt('0x' + code.toUpperCase()) : BigInt(code);
 
-        for (let v = bn; v|0n; v/=BigInt(m)) result += String.fromCharCode((v % BigInt(m) + BigInt(r)).toString(10));
+        for (let v = bn; v | 0n; v /= BigInt(m))
+          result += String.fromCharCode(
+            ((v % BigInt(m)) + BigInt(r)).toString(10)
+          );
 
-        return `e=0n;for(n of\`${result.split``.reverse().join``.replace(/(\\.)/g, '\\$1').replace(/\`/g, '\\`')}\`)e=e*${m}n+BigInt(n.charCodeAt()-${r})`
-    }
+        return `e=0n;for(n of\`${result.split``.reverse().join``
+          .replace(/(\\.)/g, '\\$1')
+          .replace(/\`/g, '\\`')}\`)e=e*${m}n+BigInt(n.charCodeAt()-${r})`;
+      };
 
-    tryMore = (code, hex=false) => {
-        let x=Infinity
+      tryMore = (code, hex = false) => {
+        let x = Infinity;
 
+        for (i = 88; i < 150; i++) {
+          for (j = 14; j < 150; j++) {
+            const asd = yetAnotherTextParser(code, i, j, hex);
 
-
-        for(i=88;i<150;i++){
-            for(j=14;j<150;j++){
-                const asd=yetAnotherTextParser(code,i,j, hex)
-
-                if(byteSize(asd) < x){
-                    x=byteSize(asd)
-                    console.log(i,j,x)
-                }
+            if (byteSize(asd) < x) {
+              x = byteSize(asd);
+              console.log(i, j, x);
             }
+          }
         }
-    }
-
-</script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3851726821780655"
-     crossorigin="anonymous"></script>
-</body>
+      };
+    </script>
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3851726821780655"
+      crossorigin="anonymous"
+    ></script>
+  </body>
 </html>
